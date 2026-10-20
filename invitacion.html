@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bodas de Perla • 30 Años de Amor</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Fondo de Tulipanes -->
+<div class="background-tulip"></div>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#FAF7F2',
+            tulip: {
+              pink: '#E8A0BF',
+              softpink: '#F8E8EE',
+              lavender: '#D8B4E2',
+              sage: '#8A9A86',
+              softsage: '#E3ECE1',
+              gold: '#C5A059',
+              goldlight: '#EEDC9A',
+            }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['"Montserrat"', 'sans-serif'],
+            script: ['"Pinyon Script"', 'cursive']
+          }
+        }
+      }
+    }
+  </script>
+<!-- Archivo de Audio MP3 oculto -->
+<audio id="bg-music" loop preload="auto">
+  <source src="(Instrumental) Como Han Pasado Los Años.mp3" type="audio/mpeg">
+  Tu navegador no soporta el elemento de audio.
+</audio>
+
+<!-- Pantalla de Bienvenida para Activar la Música -->
+<div id="welcome-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-cream/95 backdrop-blur-md transition-opacity duration-700">
+  <div class="text-center p-8 max-w-sm mx-4 bg-white/90 rounded-3xl border border-tulip-pink/40 shadow-xl">
+    <div class="w-16 h-16 rounded-full bg-tulip-softpink text-tulip-pink flex items-center justify-center mx-auto mb-4 text-2xl">
+      <i class="fa-solid fa-envelope-open-text"></i>
+    </div>
+    <h2 class="font-serif text-2xl text-gray-800 mb-2">¡Tienes una Invitación!</h2>
+    <p class="text-xs text-gray-600 mb-6 font-light">Para disfrutar la experiencia completa con música, haz clic abajo.</p>
+    
+    <button onclick="openInvitation()" class="w-full bg-tulip-pink hover:bg-tulip-pink/90 text-white font-medium text-xs uppercase tracking-widest py-3.5 px-6 rounded-full shadow-md transition-all transform hover:scale-105">
+      Abrir Invitación
+    </button>
+  </div>
+</div>
+
+<!-- Botón Flotante para Pausar/Reproducir (Opcional pero recomendado) -->
+<button id="music-toggle-btn" onclick="toggleMusic()" class="fixed bottom-5 right-5 z-40 w-12 h-12 bg-white/90 border border-tulip-pink/40 text-tulip-pink rounded-full shadow-lg flex items-center justify-center text-lg hover:scale-110 transition-all hidden">
+  <i id="music-icon" class="fa-solid fa-music"></i>
+</button>
+  <style>
+    body {
+      background-color: #FAF7F2;
+      color: #38332E;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Glassmorphism Clean Card */
+    .tulip-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(228, 160, 191, 0.3);
+      box-shadow: 0 10px 30px -10px rgba(138, 154, 134, 0.15);
+    }
+
+    /* Soft Floating Tulip Particles */
+    #tulip-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF7F2;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E8A0BF;
+      border-radius: 3px;
+    }
+    /* Estilo para el fondo fijo con la imagen del tulipán */
+.background-tulip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('tulips-salmon-pink-red-orange-tulip-flowers-isolated-on-white-ET23W9.jpg'); /* Cambia esto por la ruta o URL de tu imagen */
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.18; /* Ajusta la transparencia (0.10 a 0.30 según prefieras) */
+  pointer-events: none;
+  z-index: 0;
+}
+  </style>
+</head>
+<body class="relative min-h-screen selection:bg-tulip-softpink">
+
+  <!-- Fondo animado de pétalos flotantes -->
+  <canvas id="tulip-canvas"></canvas>
+
+  <!-- Barra de Navegación -->
+  <nav class="fixed top-0 left-0 right-0 z-40 bg-cream/90 backdrop-blur-md border-b border-tulip-pink/20 px-4 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <a href="#hero" class="font-serif text-xl md:text-2xl font-bold text-gray-800 tracking-wide">
+        <span class="couple-names-display">Jesus & Sara</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Seccion Hero / Bienvenida -->
+  <section id="hero" class="relative z-10 min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20 pb-12">
+    <div class="max-w-2xl w-full mx-auto p-8 sm:p-12 tulip-card rounded-3xl relative border border-tulip-pink/30 shadow-xl my-auto">
+      
+      
+
+      <p class="text-xs uppercase tracking-[0.25em] text-tulip-sage font-semibold mb-2">
+        Nuestras Bodas de Perla
+      </p>
+
+      <h1 class="font-serif text-3xl sm:text-5xl font-normal text-gray-900 mb-2">
+        30 Años de Casados
+      </h1>
+
+      <div class="my-4 font-script text-5xl sm:text-6xl text-tulip-pink couple-names-display">
+        Jesus &amp; Sara
+      </div>
+
+      <p class="font-serif italic text-gray-600 text-base sm:text-lg max-w-md mx-auto mb-8 font-light leading-relaxed">
+        "Con la gracia del tiempo y el florecer del amor, nos encantaría compartir la alegría de celebrar tres décadas juntos."
+      </p>
+
+      <!-- Fecha y Hora -->
+      <div class="inline-flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 pt-4 border-t border-tulip-pink/20 text-gray-700 text-sm">
+        <div class="flex items-center space-x-2">
+          <i class="fa-regular fa-calendar-check text-tulip-pink"></i>
+          <span id="hero-date-display" class="font-medium">Domingo, 25 de octubre, 2026</span>
+        </div>
+        <div class="hidden sm:block text-tulip-pink">•</div>
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-clock text-tulip-pink"></i>
+          <span id="hero-time-display" class="font-medium">14:00 hrs</span>
+        </div>
+      </div>
+
+      <!-- Botón de acción rápido -->
+      <div class="mt-8 flex justify-center gap-3">
+        <a href="#detalles" class="bg-tulip-softsage border border-tulip-sage/40 hover:bg-tulip-sage hover:text-white text-tulip-sage font-medium text-xs uppercase tracking-wider px-6 py-3 rounded-full transition-all">
+          Ver Detalles
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Aviso Solo Adultos -->
+  <section id="adults-only-section" class="relative z-10 py-6 px-4 max-w-2xl mx-auto">
+    <div class="tulip-card p-6 sm:p-8 rounded-3xl border border-tulip-pink/40 shadow-sm text-center relative overflow-hidden">
+      <div class="absolute top-0 right-0 transform translate-x-4 -translate-y-4 w-20 h-20 bg-tulip-softpink/60 rounded-full blur-xl pointer-events-none"></div>
+      
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-tulip-softpink text-tulip-pink mb-3 shadow-inner">
+        <i class="fa-solid fa-wine-glass text-lg"></i>
+      </div>
+      
+      <span class="block text-xs uppercase tracking-[0.2em] text-tulip-pink font-semibold mb-1">
+        Aviso Importante
+      </span>
+      
+      <h3 class="font-serif text-2xl text-gray-900 mb-2">
+        Celebración Solo Adultos
+      </h3>
+      
+      <div class="w-10 h-0.5 bg-tulip-pink/40 mx-auto mb-3"></div>
+      
+      <p id="display-adults-text" class="text-xs sm:text-sm text-gray-700 italic font-light leading-relaxed max-w-md mx-auto">
+        "Queremos que disfrutes al máximo de esta velada especial. Respetuosamente, hemos preparado esta recepción como un evento exclusivo para adultos."
+      </p>
+    </div>
+  </section>
+
+  <!-- Contador de Días -->
+  <section id="countdown" class="relative z-10 py-12 px-4 bg-tulip-softpink/40 border-y border-tulip-pink/20">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="font-serif text-xl sm:text-3xl text-gray-800 mb-1">Faltan Muy Pocos Días</h2>
+      <p class="text-xs uppercase tracking-widest text-tulip-sage font-medium mb-6">Contando los días para celebrar</p>
+
+      <div class="grid grid-cols-4 gap-2 sm:gap-4 max-w-lg mx-auto">
+        <div class="bg-white/80 p-3 sm:p-4 rounded-2xl border border-tulip-pink/30 text-center shadow-sm">
+          <span id="timer-days" class="font-serif text-2xl sm:text-4xl font-bold text-gray-800 block">00</span>
+          <span class="text-[10px] sm:text-xs uppercase text-gray-500 font-medium tracking-wider mt-1 block">Días</span>
+        </div>
+        <div class="bg-white/80 p-3 sm:p-4 rounded-2xl border border-tulip-pink/30 text-center shadow-sm">
+          <span id="timer-hours" class="font-serif text-2xl sm:text-4xl font-bold text-gray-800 block">00</span>
+          <span class="text-[10px] sm:text-xs uppercase text-gray-500 font-medium tracking-wider mt-1 block">Horas</span>
+        </div>
+        <div class="bg-white/80 p-3 sm:p-4 rounded-2xl border border-tulip-pink/30 text-center shadow-sm">
+          <span id="timer-minutes" class="font-serif text-2xl sm:text-4xl font-bold text-gray-800 block">00</span>
+          <span class="text-[10px] sm:text-xs uppercase text-gray-500 font-medium tracking-wider mt-1 block">Min.</span>
+        </div>
+        <div class="bg-white/80 p-3 sm:p-4 rounded-2xl border border-tulip-pink/30 text-center shadow-sm">
+          <span id="timer-seconds" class="font-serif text-2xl sm:text-4xl font-bold text-gray-800 block">00</span>
+          <span class="text-[10px] sm:text-xs uppercase text-gray-500 font-medium tracking-wider mt-1 block">Seg.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detalles de Lugar y Menú -->
+  <section id="detalles" class="relative z-10 py-16 px-4 max-w-4xl mx-auto">
+    <div class="text-center mb-10">
+      <span class="text-xs uppercase tracking-widest text-tulip-sage font-semibold">¿Dónde & Cuándo?</span>
+      <h2 class="font-serif text-3xl sm:text-4xl text-gray-900 mt-1">Lugar y Recepción</h2>
+      <div class="w-12 h-0.5 bg-tulip-pink/60 mx-auto mt-3"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Tarjeta Ubicación -->
+      <div class="tulip-card p-6 sm:p-8 rounded-2xl border border-tulip-pink/30 flex flex-col justify-between shadow-sm">
+        <div>
+          <div class="w-10 h-10 rounded-full bg-tulip-softpink text-tulip-pink flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+          <h3 class="font-serif text-2xl text-center text-gray-800 mb-1">Lugar de la Fiesta</h3>
+          <p class="text-center text-xs uppercase tracking-wider text-tulip-sage mb-6 font-semibold">Recepción & Celebración</p>
+          
+          <div class="space-y-3 text-sm text-gray-700 mb-6">
+            <div class="flex items-start space-x-3">
+              <i class="fa-regular fa-clock text-tulip-pink mt-1"></i>
+              <div>
+                <strong class="block text-gray-900">Hora de Inicio:</strong>
+                <span id="display-event-time">14 t:00 hrs</span>
+              </div>
+            </div>
+            <div class="flex items-start space-x-3">
+              <i class="fa-solid fa-map-pin text-tulip-pink mt-1"></i>
+              <div>
+                <strong class="block text-gray-900">Ubicación:</strong>
+                <span id="display-venue-name" class="font-medium">Bar El Tunel</span>
+                <p id="display-venue-address" class="text-xs text-gray-500 mt-0.5">Av Independencia 1814 A, Jardines de la Concepción II, 20120 Aguascalientes, Ags.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a id="venue-map-link" href="https://maps.app.goo.gl/KaqvdoYXCgi6KBtF7" target="_blank" rel="noopener" class="w-full text-center border border-tulip-pink text-tulip-pink hover:bg-tulip-pink hover:text-white py-2.5 rounded-full text-xs uppercase tracking-wider font-semibold transition-all">
+          <i class="fa-solid fa-map-location-dot mr-2"></i>Abrir en Google Maps
+        </a>
+      </div>
+
+      <!-- Tarjeta Menú -->
+      <div class="tulip-card p-6 sm:p-8 rounded-2xl border border-tulip-pink/30 flex flex-col justify-between shadow-sm">
+        <div>
+          <div class="w-10 h-10 rounded-full bg-tulip-softsage text-tulip-sage flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-utensils"></i>
+          </div>
+          <h3 class="font-serif text-2xl text-center text-gray-800 mb-1">Menú del Evento</h3>
+          <p class="text-center text-xs uppercase tracking-wider text-tulip-sage mb-6 font-semibold">Comida & Banquete</p>
+          
+          <div class="space-y-4 text-sm text-gray-700 mb-6">
+            <div class="border-b border-tulip-pink/20 pb-2">
+              <span class="text-xs text-tulip-pink uppercase font-semibold block">Entrada</span>
+              <p id="display-menu-starter" class="text-gray-800 font-medium">Tacos</p>
+            </div>
+            <div class="border-b border-tulip-pink/20 pb-2">
+              <span class="text-xs text-tulip-pink uppercase font-semibold block">Plato Fuerte</span>
+              <p id="display-menu-main" class="text-gray-800 font-medium">Tacos</p>
+            </div>
+            <div>
+              <span class="text-xs text-tulip-pink uppercase font-semibold block">Postre</span>
+              <p id="display-menu-dessert" class="text-gray-800 font-medium">Tacos</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-tulip-softpink/60 rounded-xl p-3 text-center text-xs text-gray-600 italic">
+          <i class="fa-solid fa-glass-cheers text-tulip-pink mr-1"></i> el consumo de alcohol es responsabilidad de cada quien.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LÓGICA JAVASCRIPT -->
+  <script>
+    const bgMusic = document.getElementById('bg-music');
+const welcomeModal = document.getElementById('welcome-modal');
+const musicToggleBtn = document.getElementById('music-toggle-btn');
+const musicIcon = document.getElementById('music-icon');
+
+// Función que abre la invitación e inicia el MP3
+function openInvitation() {
+  // Intentar reproducir el audio
+  bgMusic.play().then(() => {
+    musicToggleBtn.classList.remove('hidden');
+  }).catch((error) => {
+    console.log("Error al reproducir audio:", error);
+  });
+
+  // Desvanecer y ocultar la pantalla de bienvenida
+  welcomeModal.classList.add('opacity-0', 'pointer-events-none');
+  setTimeout(() => {
+    welcomeModal.classList.add('hidden');
+  }, 700);
+}
+
+// Función para pausar o reanudar la música manualmente
+function toggleMusic() {
+  if (bgMusic.paused) {
+    bgMusic.play();
+    musicIcon.className = "fa-solid fa-music";
+  } else {
+    bgMusic.pause();
+    musicIcon.className = "fa-solid fa-volume-xmark";
+  }
+}
+    // Configuración de la Fecha del Evento para el Contador
+    const targetDate = new Date("2026-10-25T14:00:00").getTime();
+
+    // 1. Partículas de Tulipanes Flotantes (Canvas)
+    (function initTulipCanvas() {
+      const canvas = document.getElementById('tulip-canvas');
+      const ctx = canvas.getContext('2d');
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const petals = [];
+      const numPetals = Math.min(25, Math.floor(width / 35));
+
+      for (let i = 0; i < numPetals; i++) {
+        petals.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: Math.random() * 8 + 6,
+          speedY: Math.random() * 0.3 + 0.1,
+          speedX: (Math.random() - 0.5) * 0.2,
+          opacity: Math.random() * 0.4 + 0.2,
+          color: Math.random() > 0.5 ? 'rgba(232, 160, 191, ' : 'rgba(216, 180, 226, '
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        petals.forEach((p) => {
+          p.y -= p.speedY;
+          p.x += p.speedX;
+
+          if (p.y < -15) p.y = height + 15;
+          if (p.x < -15) p.x = width + 15;
+          if (p.x > width + 15) p.x = -15;
+
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y, p.size * 0.6, p.size, Math.PI / 4, 0, 2 * Math.PI);
+          ctx.fillStyle = p.color + p.opacity + ')';
+          ctx.fill();
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      window.onload = function() {
+        animate();
+      };
+    })();
+
+    // 2. Contador Regresivo
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      if (distance < 0) {
+        document.getElementById("timer-days").innerText = "00";
+        document.getElementById("timer-hours").innerText = "00";
+        document.getElementById("timer-minutes").innerText = "00";
+        document.getElementById("timer-seconds").innerText = "00";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("timer-days").innerText = days < 10 ? "0" + days : days;
+      document.getElementById("timer-hours").innerText = hours < 10 ? "0" + hours : hours;
+      document.getElementById("timer-minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+      document.getElementById("timer-seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
+</body>
+</html>
